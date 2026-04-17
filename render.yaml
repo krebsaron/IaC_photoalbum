@@ -1,0 +1,39 @@
+databases:
+  - name: photoalbum-db
+    plan: free
+
+services:
+  - type: web
+    name: photoalbum-web
+    runtime: python
+    plan: free
+    autoDeployTrigger: checksPass
+    buildCommand: pip install -r requirements.txt
+    preDeployCommand: python manage.py migrate --no-input && python manage.py collectstatic --no-input --clear
+    startCommand: gunicorn photoalbum.wsgi --bind 0.0.0.0:$PORT --log-file -
+    healthCheckPath: /healthz/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: DATABASE_URL
+        fromDatabase:
+          name: photoalbum-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: 127.0.0.1,localhost
+      - key: CSRF_TRUSTED_ORIGINS
+        value: http://127.0.0.1,http://localhost
+      - key: DB_SSL_REQUIRE
+        value: "True"
+      - key: USE_CLOUDINARY
+        value: "True"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
