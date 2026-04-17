@@ -8,8 +8,7 @@ services:
     runtime: python
     plan: free
     autoDeployTrigger: checksPass
-    buildCommand: pip install -r requirements.txt
-    preDeployCommand: python manage.py migrate --no-input && python manage.py collectstatic --no-input --clear
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --no-input && python manage.py collectstatic --no-input --clear
     startCommand: gunicorn photoalbum.wsgi --bind 0.0.0.0:$PORT --log-file -
     healthCheckPath: /healthz/
     envVars:
